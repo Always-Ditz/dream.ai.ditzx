@@ -1,0 +1,11 @@
+{
+  "name": "carbon-generator-vercel",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "echo 'Deploy to Vercel to run'"
+  },
+  "dependencies": {
+    "@microlink/mql": "^0.10.16",
+    "axios": "^1.6.0"
+  }
+}
