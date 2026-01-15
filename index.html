@@ -1,326 +1,497 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carbon Code Generator</title>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Fira+Code&display=swap" rel="stylesheet">
+    <title>Dream AI Studio</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
     <style>
         :root {
-            --bg-color: #262424;
-            /* Grid putih transparan (jelas tapi tidak sakit mata) */
-            --grid-color: rgba(255, 255, 255, 0.08); 
-            --primary-white: #ffffff;
-            --text-dark: #262424;
-            --glass-bg: rgba(20, 20, 20, 0.6);
-            --border-color: rgba(255, 255, 255, 0.15);
+            /* Variables - Dark Mode (Default) */
+            --bg-color: #0f172a; /* Slate 900 */
+            --glass-bg: rgba(30, 41, 59, 0.7); /* Slate 800 semi-transparent */
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --primary: #6366f1; /* Indigo */
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --accent: #ec4899; /* Pink */
+            --input-bg: rgba(15, 23, 42, 0.6);
+            --grid-color: rgba(255, 255, 255, 0.05);
+            --radius: 16px;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        [data-theme="light"] {
+            /* Variables - Light Mode (Professional Clean) */
+            --bg-color: #f8fafc; /* Slate 50 */
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(0, 0, 0, 0.05);
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.2);
+            --accent: #d946ef;
+            --input-bg: #f1f5f9;
+            --grid-color: #cbd5e1; /* Dot color clearer */
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
 
         body {
-            font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
-            color: var(--primary-white);
+            color: var(--text-main);
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: center; /* Center vertically */
             padding: 20px;
-            
-            /* Pola Grid */
-            background-image: 
-                linear-gradient(var(--grid-color) 1px, transparent 1px),
-                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-            background-size: 30px 30px;
+            overflow-x: hidden;
+            transition: background 0.4s ease;
+            position: relative;
         }
 
-        /* Animasi Fade In */
-        .fade-in {
-            animation: fadeIn 0.8s ease-out forwards;
-            opacity: 0;
-            transform: translateY(20px);
+        /* Background Pattern (Dots instead of Grid for cleaner look) */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(var(--grid-color) 1px, transparent 1px);
+            background-size: 24px 24px;
+            z-index: -1;
+            mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
         }
 
-        @keyframes fadeIn {
-            to { opacity: 1; transform: translateY(0); }
+        /* Ambient Glow Background Effect */
+        .glow-orb {
+            position: absolute;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, var(--primary), transparent 70%);
+            opacity: 0.2;
+            filter: blur(80px);
+            z-index: -1;
+            top: 10%; left: 50%;
+            transform: translateX(-50%);
+            animation: pulseGlow 8s infinite alternate;
         }
 
-        .container {
+        @keyframes pulseGlow {
+            0% { opacity: 0.15; transform: translateX(-50%) scale(1); }
+            100% { opacity: 0.3; transform: translateX(-50%) scale(1.2); }
+        }
+
+        /* Main App Container */
+        .app-container {
             width: 100%;
-            max-width: 800px;
+            max-width: 550px; /* Slightly wider */
             background: var(--glass-bg);
-            padding: 2.5rem;
-            border-radius: 16px;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            text-align: center;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        header {
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Header Fix */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 2rem;
+            position: relative;
         }
 
-        header h1 {
-            font-size: 2rem;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            margin-bottom: 0.5rem;
+            color: white;
+            font-size: 20px;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .brand h1 {
+            font-size: 1.25rem;
             font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
-        header p {
-            color: #aaa;
-            font-size: 0.95rem;
+        /* Theme Toggle Button Fix */
+        .theme-btn {
+            background: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .input-group textarea {
+        .theme-btn:hover {
+            transform: rotate(15deg) scale(1.05);
+            background: var(--glass-border);
+        }
+
+        /* Inputs */
+        .control-group { margin-bottom: 1.5rem; }
+        
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-sub);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select, textarea {
             width: 100%;
-            height: 200px;
-            background: rgba(0, 0, 0, 0.3);
-            color: #f8f8f2;
-            border: 1px solid #444;
-            border-radius: 10px;
-            padding: 1.2rem;
-            font-family: 'Fira Code', monospace;
-            font-size: 14px;
-            line-height: 1.5;
-            resize: vertical;
+            background: var(--input-bg);
+            border: 2px solid transparent;
+            color: var(--text-main);
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 1rem;
             outline: none;
-            transition: border-color 0.3s;
-            margin-bottom: 1.5rem;
+            transition: all 0.2s;
         }
 
-        .input-group textarea:focus {
-            border-color: var(--primary-white);
-            background: rgba(0, 0, 0, 0.5);
+        select:focus, textarea:focus {
+            border-color: var(--primary);
+            background: var(--bg-color);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+
+        textarea {
+            resize: none;
+            height: 120px;
+            line-height: 1.5;
         }
 
         /* Buttons */
-        button {
-            cursor: pointer;
-            font-weight: 600;
+        .action-area {
+            display: flex;
+            gap: 12px;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 16px 24px;
+            border-radius: 14px;
             border: none;
-            border-radius: 8px;
-            display: inline-flex;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 12px 24px;
-            transition: all 0.2s ease;
-            font-size: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .btn-primary {
-            background-color: var(--primary-white);
-            color: var(--text-dark);
-            width: 100%;
+        .btn:active { transform: scale(0.96); }
+
+        .btn-reset {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-sub);
+            width: 60px; /* Square button for reset */
+        }
+        
+        .btn-reset:hover {
+            background: var(--input-bg);
+            color: var(--text-main);
         }
 
-        .btn-primary:hover:not(:disabled) {
+        .btn-generate {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 8px 20px var(--primary-glow);
+        }
+
+        .btn-generate:hover {
+            box-shadow: 0 12px 25px var(--primary-glow);
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
         }
 
-        .btn-primary:disabled {
+        .btn-generate:disabled {
             opacity: 0.7;
             cursor: not-allowed;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 1.5rem;
-        }
-
-        .btn-secondary {
-            background-color: transparent;
-            border: 2px solid var(--primary-white);
-            color: var(--primary-white);
-            min-width: 140px;
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--primary-white);
-            color: var(--text-dark);
+            transform: none;
         }
 
         /* Result Area */
-        .hidden { display: none; }
-
-        #resultContainer {
-            margin-top: 2.5rem;
-            border-top: 1px solid var(--border-color);
-            padding-top: 2rem;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .image-wrapper {
-            position: relative;
-            background: rgba(0,0,0,0.2);
-            border-radius: 10px;
-            padding: 10px;
-            min-height: 100px;
+        .result-frame {
+            margin-top: 2rem;
+            background: var(--input-bg);
+            border-radius: var(--radius);
+            min-height: 300px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            border: 2px dashed var(--glass-border);
+            transition: all 0.3s;
         }
 
-        img {
-            max-width: 100%;
+        .result-frame.has-image {
+            border: none;
+            background: transparent;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .result-img {
+            width: 100%;
             height: auto;
-            border-radius: 8px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            display: block;
+            border-radius: var(--radius);
+            display: none;
+            opacity: 0;
+            animation: fadeInImg 1s ease forwards;
         }
 
-        /* Spinner Animation */
-        .spin {
+        @keyframes fadeInImg { from { opacity: 0; transform: scale(1.02); } to { opacity: 1; transform: scale(1); } }
+
+        .placeholder-content {
+            text-align: center;
+            color: var(--text-sub);
+            padding: 2rem;
+        }
+
+        .placeholder-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        /* Loading Animation */
+        .loader-ring {
+            display: none;
+            width: 48px; height: 48px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Download Button Overlay */
+        .download-overlay {
+            margin-top: 15px;
+            width: 100%;
+            display: none;
+            animation: slideUp 0.3s ease;
         }
 
-        /* Mobile Responsive */
-        @media (max-width: 600px) {
-            .container { padding: 1.5rem; }
-            .action-buttons { flex-direction: column; }
-            .btn-secondary { width: 100%; }
+        .btn-download {
+            width: 100%;
+            background: var(--text-main);
+            color: var(--bg-color);
         }
+
     </style>
 </head>
 <body>
 
-    <div class="container fade-in">
-        <header>
-            <h1><i data-lucide="code-2"></i> Carbon Gen</h1>
-            <p>Paste code. Generate image. Done.</p>
-        </header>
+    <div class="glow-orb"></div>
 
-        <main>
-            <div class="input-group">
-                <textarea id="codeInput" placeholder="// Paste your code here..."></textarea>
+    <div class="app-container">
+        <div class="header">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="ph-fill ph-sparkle"></i>
+                </div>
+                <div>
+                    <h1>Dream AI</h1>
+                    <span style="font-size: 0.8rem; color: var(--text-sub); font-weight: 500;">Creative Studio</span>
+                </div>
             </div>
-
-            <button id="btnGenerate" class="btn-primary">
-                <i data-lucide="zap"></i> Generate Image
+            <button class="theme-btn" onclick="toggleTheme()" aria-label="Ganti Tema">
+                <i id="theme-icon" class="ph ph-moon"></i>
             </button>
+        </div>
 
-            <div id="resultContainer" class="hidden">
-                <div class="image-wrapper">
-                    <img id="generatedImage" src="" alt="Generated Code">
-                </div>
+        <div class="control-group">
+            <label>Model AI</label>
+            <select id="modelSelect">
+                <option value="6">Flux Kontext Pro (Best for Editing)</option>
+                <option value="1">Seedream 4.5 (Photorealistic)</option>
+                <option value="2">Nano Banana Pro (High Quality)</option>
+                <option value="3">Illustrious-SDXL (Anime Style)</option>
+                <option value="4">Seedream 4.0 (Vivid Colors)</option>
+                <option value="5">Nano Banana (Square 1:1)</option>
+            </select>
+        </div>
 
-                <div class="action-buttons">
-                    <button id="btnReset" class="btn-secondary">
-                        <i data-lucide="refresh-cw"></i> Reset
-                    </button>
-                    <button id="btnDownload" class="btn-secondary">
-                        <i data-lucide="download"></i> Download
-                    </button>
-                </div>
+        <div class="control-group">
+            <label>Prompt Imajinasi</label>
+            <textarea id="promptInput" placeholder="Deskripsikan gambar yang ingin kamu buat secara detail...&#10;Contoh: A futuristic city in Jakarta with flying cars, cyberpunk style, neon lights, 8k resolution."></textarea>
+        </div>
+
+        <div class="action-area">
+            <button class="btn btn-reset" onclick="resetForm()" title="Reset">
+                <i class="ph ph-arrow-counter-clockwise"></i>
+            </button>
+            <button class="btn btn-generate" onclick="generateImage()" id="genBtn">
+                <i class="ph ph-magic-wand"></i>
+                <span>Generate Art</span>
+            </button>
+        </div>
+
+        <div class="result-frame" id="resultArea">
+            <div class="loader-ring" id="loader"></div>
+            
+            <div class="placeholder-content" id="placeholder">
+                <i class="ph ph-image placeholder-icon"></i>
+                <p>Karya seni kamu akan muncul di sini</p>
             </div>
-        </main>
+
+            <img id="generatedImage" class="result-img" alt="AI Result" />
+        </div>
+
+        <div class="download-overlay" id="downloadOverlay">
+            <a id="downloadLink" href="#" class="btn btn-download" style="text-decoration: none;">
+                <i class="ph ph-download-simple"></i> Download HD
+            </a>
+        </div>
     </div>
 
     <script>
-        // Initialize Icons
-        lucide.createIcons();
+        // Logic JS tetap sama, hanya penyesuaian ID sedikit
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            const currentTheme = html.getAttribute('data-theme');
+            
+            if (currentTheme === 'dark') {
+                html.setAttribute('data-theme', 'light');
+                icon.classList.replace('ph-moon', 'ph-sun');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                icon.classList.replace('ph-sun', 'ph-moon');
+            }
+        }
 
-        const btnGenerate = document.getElementById('btnGenerate');
-        const btnDownload = document.getElementById('btnDownload');
-        const btnReset = document.getElementById('btnReset');
-        const codeInput = document.getElementById('codeInput');
-        const resultContainer = document.getElementById('resultContainer');
-        const generatedImage = document.getElementById('generatedImage');
+        function resetForm() {
+            document.getElementById('promptInput').value = '';
+            const frame = document.getElementById('resultArea');
+            frame.classList.remove('has-image');
+            
+            document.getElementById('generatedImage').style.display = 'none';
+            document.getElementById('placeholder').style.display = 'block';
+            document.getElementById('downloadOverlay').style.display = 'none';
+        }
 
-        let currentImageUrl = null;
+        async function generateImage() {
+            const prompt = document.getElementById('promptInput').value;
+            const modelId = document.getElementById('modelSelect').value;
+            const btn = document.getElementById('genBtn');
+            const btnText = btn.querySelector('span');
+            const btnIcon = btn.querySelector('i');
+            
+            const loader = document.getElementById('loader');
+            const placeholder = document.getElementById('placeholder');
+            const img = document.getElementById('generatedImage');
+            const downloadOverlay = document.getElementById('downloadOverlay');
+            const frame = document.getElementById('resultArea');
 
-        // Generate Handler
-        btnGenerate.addEventListener('click', async () => {
-            const code = codeInput.value.trim();
-            if (!code) return alert("Please enter some code first!");
+            if (!prompt) {
+                // Shake animation for error
+                document.getElementById('promptInput').focus();
+                return;
+            }
 
-            // Loading State
-            const originalContent = btnGenerate.innerHTML;
-            btnGenerate.innerHTML = `<i data-lucide="loader-2" class="spin"></i> Generating...`;
-            lucide.createIcons();
-            btnGenerate.disabled = true;
-            resultContainer.classList.add('hidden');
+            // UI Loading State
+            btn.disabled = true;
+            btnText.innerText = 'Creating Magic...';
+            btnIcon.classList.replace('ph-magic-wand', 'ph-spinner');
+            btnIcon.classList.add('ph-spin'); // spin animation from phosphor
+
+            loader.style.display = 'block';
+            placeholder.style.display = 'none';
+            img.style.display = 'none';
+            downloadOverlay.style.display = 'none';
+            frame.classList.remove('has-image');
 
             try {
+                // Request ke Backend Vercel kamu
                 const response = await fetch('/api/generate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code })
+                    body: JSON.stringify({ prompt, modelId })
                 });
 
                 const data = await response.json();
 
-                if (data.success) {
-                    currentImageUrl = data.image;
-                    generatedImage.src = currentImageUrl;
+                if (!response.ok) throw new Error(data.error || 'Gagal membuat gambar');
+
+                if (data.success && data.images.length > 0) {
+                    const imageUrl = data.images[0];
                     
-                    // Show result when image is loaded
-                    generatedImage.onload = () => {
-                        resultContainer.classList.remove('hidden');
-                        // Scroll to result smoothly
-                        resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    // Preload image before showing
+                    const tempImg = new Image();
+                    tempImg.src = imageUrl;
+                    
+                    tempImg.onload = () => {
+                        loader.style.display = 'none';
+                        img.src = imageUrl;
+                        img.style.display = 'block';
+                        frame.classList.add('has-image');
+                        downloadOverlay.style.display = 'block';
+                        
+                        // Setup Proxy Download Link
+                        const downloadBtn = document.getElementById('downloadLink');
+                        downloadBtn.href = `/api/download?url=${encodeURIComponent(imageUrl)}`;
+                        
+                        // Reset Button State
+                        resetBtnState();
                     };
                 } else {
-                    alert('Error: ' + (data.error || 'Failed to generate image'));
+                    throw new Error('No image data returned');
                 }
 
-            } catch (err) {
-                console.error(err);
-                alert('Connection error. Please try again.');
-            } finally {
-                // Reset Button State
-                btnGenerate.innerHTML = originalContent;
-                lucide.createIcons();
-                btnGenerate.disabled = false;
+            } catch (error) {
+                alert(error.message);
+                loader.style.display = 'none';
+                placeholder.style.display = 'block';
+                placeholder.innerHTML = `<span style="color:var(--accent)">Error: ${error.message}</span>`;
+                resetBtnState();
             }
-        });
 
-        // Download Handler (Streaming via Vercel Function)
-        btnDownload.addEventListener('click', () => {
-            if (!currentImageUrl) return;
-            
-            // Set Loading on download button
-            const originalContent = btnDownload.innerHTML;
-            btnDownload.innerHTML = `<i data-lucide="loader-2" class="spin"></i> ...`;
-            lucide.createIcons();
-            
-            // Redirect to streaming endpoint
-            // Menggunakan timeout agar loading icon terlihat sebentar sebelum download dialog muncul
-            setTimeout(() => {
-                window.location.href = `/api/download?url=${encodeURIComponent(currentImageUrl)}`;
-                btnDownload.innerHTML = originalContent;
-                lucide.createIcons();
-            }, 500);
-        });
-
-        // Reset Handler
-        btnReset.addEventListener('click', () => {
-            codeInput.value = '';
-            resultContainer.classList.add('hidden');
-            generatedImage.src = '';
-            currentImageUrl = null;
-            codeInput.focus();
-        });
+            function resetBtnState() {
+                btn.disabled = false;
+                btnText.innerText = 'Generate Art';
+                btnIcon.classList.remove('ph-spin');
+                btnIcon.classList.replace('ph-spinner', 'ph-magic-wand');
+            }
+        }
     </script>
 </body>
-</html>
+    </html>
